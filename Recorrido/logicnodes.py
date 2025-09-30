@@ -1,4 +1,4 @@
-import requests, re
+import requests, re, json
 import chromadb
 from pathlib import Path
 from .instruccionesRec import cargar_instrucciones
@@ -15,6 +15,19 @@ collection = chroma.get_or_create_collection(f"{APP_NAME}_docs")
 # Carpeta de documentos
 DOCS_PATH = Path(f"./{APP_NAME}/docs")
 DOCS_PATH.mkdir(parents=True, exist_ok=True)
+
+# Archivo de nodos (contextos por lugar)
+NODOS_PATH = Path(f"./{APP_NAME}/nodos.json")
+
+def cargar_nodos():
+    if NODOS_PATH.exists():
+        with open(NODOS_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+# Nodo actual del usuario (ejemplo simple global)
+NODOS = cargar_nodos()
+NODO_ACTUAL = "auditorio"
 
 # Cargar instrucciones propias
 INSTRUCCIONES = cargar_instrucciones(Path(f"./{APP_NAME}/instruccionesRecorrido"))
@@ -34,14 +47,28 @@ def insertar_doc(doc):
         f.write(doc.texto)
     return {"status": "ok", "id": doc.id}
 
-def responder_chat(data, nodo_info=""):
+def set_nodo_actual(nodo_id: str):
+    global NODO_ACTUAL, NODOS
+    NODOS = cargar_nodos()  # recarga por si el archivo cambió
+    if nodo_id in NODOS:
+        NODO_ACTUAL = nodo_id
+        return {"status": "ok", "nodo": nodo_id}
+    return {"error": "Nodo no encontrado"}
+
+def responder_chat(data):
     """
     data: objeto con atributo `pregunta`
-    nodo_info: información contextual del nodo actual (para usar como contexto, no repetir literalmente)
     """
+    # Recargar nodos (para reflejar cambios en caliente)
+    global NODOS
+    NODOS = cargar_nodos()
+
     # Recuperar contexto desde Chroma
     resultados = collection.query(query_texts=[data.pregunta], n_results=3)
     contexto = " ".join(resultados["documents"][0]) if resultados["documents"] else ""
+
+    # Contexto del nodo actual
+    nodo_info = NODOS.get(NODO_ACTUAL, "")
 
     # Construir prompt incluyendo info del nodo
     prompt = (
