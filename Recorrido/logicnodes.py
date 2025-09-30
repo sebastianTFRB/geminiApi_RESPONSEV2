@@ -50,10 +50,24 @@ def insertar_doc(doc):
 def set_nodo_actual(nodo_id: str):
     global NODO_ACTUAL, NODOS
     NODOS = cargar_nodos()  # recarga por si el archivo cambió
+
+    # Caso 1: nodo_id es vacío o None → fallback
+    if not nodo_id:
+        NODO_ACTUAL = "nodo_sin_contexto"
+        return {"status": "ok", "nodo": NODO_ACTUAL, "info": "Asignado automáticamente por falta de id"}
+
+    # Caso 2: nodo_id existe en nodos.json
     if nodo_id in NODOS:
         NODO_ACTUAL = nodo_id
         return {"status": "ok", "nodo": nodo_id}
-    return {"error": "Nodo no encontrado"}
+
+    # Caso 3: nodo_id no existe → fallback también
+    NODO_ACTUAL = "nodo_sin_contexto"
+    return {
+        "status": "warning",
+        "nodo": NODO_ACTUAL,
+        "info": f"El nodo '{nodo_id}' no fue encontrado. Se asignó 'nodo_sin_contexto'."
+    }
 
 def responder_chat(data):
     """
