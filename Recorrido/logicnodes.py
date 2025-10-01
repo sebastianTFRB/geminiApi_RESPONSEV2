@@ -1,5 +1,4 @@
 import requests, re, json
-import chromadb
 from pathlib import Path
 from .instruccionesRec import cargar_instrucciones
 
@@ -8,11 +7,7 @@ APP_NAME = "Recorrido"
 GEMINI_KEY = "AIzaSyAdvIae-CvrEiOMkMgjjRusV_tixeFGbfc"
 MODELO_GEMINI = "gemini-2.0-flash"  # Modelo disponible más reciente
 
-# Inicializar ChromaDB colección propia
-chroma = chromadb.Client()
-collection = chroma.get_or_create_collection(f"{APP_NAME}_docs")
-
-# Carpeta de documentos
+# Carpeta de documentos (contexto local)
 DOCS_PATH = Path(f"./{APP_NAME}/docs")
 DOCS_PATH.mkdir(parents=True, exist_ok=True)
 
@@ -36,32 +31,28 @@ def limpiar_texto(texto: str) -> str:
     texto = re.sub(r"[*#_`]+", "", texto)
     return texto.replace("\n", " ").strip()
 
-def insertar_doc(doc):
-    if not doc.texto.strip():
-        return {"error": "Texto vacío"}
-    existing = collection.get(ids=[doc.id])
-    if existing['ids']:
-        return {"error": f"Documento {doc.id} ya existe"}
-    collection.add(documents=[doc.texto], ids=[doc.id])
-    with open(DOCS_PATH / f"{doc.id}.txt", "w", encoding="utf-8") as f:
-        f.write(doc.texto)
-    return {"status": "ok", "id": doc.id}
+def cargar_docs():
+    """Carga todos los documentos de DOCS_PATH y los devuelve como lista de strings"""
+    docs = []
+    for archivo in DOCS_PATH.glob("*.txt"):
+        with open(archivo, "r", encoding="utf-8") as f:
+            contenido = f.read().strip()
+            if contenido:
+                docs.append(contenido)
+    return docs
 
 def set_nodo_actual(nodo_id: str):
     global NODO_ACTUAL, NODOS
     NODOS = cargar_nodos()  # recarga por si el archivo cambió
 
-    # Caso 1: nodo_id es vacío o None → fallback
     if not nodo_id:
         NODO_ACTUAL = "nodo_sin_contexto"
         return {"status": "ok", "nodo": NODO_ACTUAL, "info": "Asignado automáticamente por falta de id"}
 
-    # Caso 2: nodo_id existe en nodos.json
     if nodo_id in NODOS:
         NODO_ACTUAL = nodo_id
         return {"status": "ok", "nodo": nodo_id}
 
-    # Caso 3: nodo_id no existe → fallback también
     NODO_ACTUAL = "nodo_sin_contexto"
     return {
         "status": "warning",
@@ -73,27 +64,29 @@ def responder_chat(data):
     """
     data: objeto con atributo `pregunta`
     """
-    # Recargar nodos (para reflejar cambios en caliente)
     global NODOS
     NODOS = cargar_nodos()
 
-    # Recuperar contexto desde Chroma
-    resultados = collection.query(query_texts=[data.pregunta], n_results=3)
-    contexto = " ".join(resultados["documents"][0]) if resultados["documents"] else ""
+    # Recuperar contexto desde archivos locales
+    documentos = cargar_docs()
+
+    # Formatear documentos como lista Markdown para darles más peso
+    contexto_formateado = "\n\n".join([f"- {doc}" for doc in documentos])
 
     # Contexto del nodo actual
     nodo_info = NODOS.get(NODO_ACTUAL, "")
 
-    # Construir prompt incluyendo info del nodo
+    # Construir prompt
     prompt = (
         f"Instrucciones del sistema ({APP_NAME}):\n{INSTRUCCIONES}\n\n"
-        f"Contexto recuperado:\n{contexto}\n\n"
-        f"Información relevante del lugar actual (solo usar si es relevante para la pregunta; no mencionarla de otra manera):\n{nodo_info}\n\n"
+        f"Contexto recuperado (usar este contenido como referencia principal para responder):\n{contexto_formateado}\n\n"
+        f"Información relevante del lugar actual (usar solo si la pregunta lo requiere):\n"
+        f"{nodo_info if 'lugar' in data.pregunta.lower() else ''}\n\n"
         f"Pregunta del usuario: {data.pregunta}\n\n"
-        f"Nota para el modelo: "
-        f"Usa la información del lugar actual únicamente si el usuario la pregunta explícitamente. "
-        f"No repitas la descripción del lugar si no es necesario. "
-        f"Prioriza responder a la pregunta de manera natural."
+        f"Nota para el modelo:\n"
+        f"- Prioriza siempre usar la información de los documentos recuperados.\n"
+        f"- Usa la información del lugar solo si el usuario la pregunta explícitamente.\n"
+        f"- Responde de manera concisa, solo amplía si el usuario pide más detalles.\n"
     )
 
     # Endpoint Gemini
@@ -120,7 +113,7 @@ def responder_chat(data):
     r2.raise_for_status()
     audio_data = r2.json()["audioContent"]
 
-    return {"respuesta": respuesta, "audio": audio_data, "contexto": contexto}
+    return {"respuesta": respuesta, "audio": audio_data, "contexto": contexto_formateado}
 
 def stt_transcripcion(data):
     """

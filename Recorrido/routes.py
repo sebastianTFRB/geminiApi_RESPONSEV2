@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from .logicnodes import insertar_doc, responder_chat, stt_transcripcion, set_nodo_actual
+from .logicnodes import responder_chat, stt_transcripcion, set_nodo_actual
 
 router = APIRouter()
 
