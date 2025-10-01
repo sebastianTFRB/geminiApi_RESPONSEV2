@@ -1,0 +1,66 @@
+# Contexto: Ingeniería de Software - Universidad Cooperativa de Colombia (UCC) Campus Pasto
+
+## Información General del Programa
+- **Título otorgado:** Ingeniero(a) de Software
+- **Modalidad:** Presencial
+- **Duración:** 8 semestres (4 años)
+- **Créditos académicos:** 144
+- **Horario:** Jornada mañana, tarde y noche (Lunes a Viernes)
+- **Diferenciador:** Programa único en el suroccidente colombiano, con convenios vigentes con empresas como **Microsoft** y **Amazon**.
+
+## Materias y Énfasis en Áreas Clave
+
+### 1. Fundamentos y Ciencias Básicas (Primeros Semestres)
+- Construcción de Algoritmos  
+- Cálculo Diferencial, Integral y Multivariado  
+- Álgebra Lineal  
+- Probabilidad y Estadística  
+- Física (Mecánica, Electricidad y Magnetismo)
+
+### 2. Ingeniería de Software Específica y Desarrollo
+- Ingeniería de Requisitos  
+- Diseño de Software y Patrones de Software  
+- Análisis de Software  
+- Diseño de Interfaces de Software  
+- Programación Orientada a la Web  
+- Programación de Sistemas Embebidos y Tiempo Real  
+- Pruebas y Mantenimiento de Software  
+- Metodologías de Software Colaborativo  
+- Calidad de Software
+
+### 3. Sistemas y Tecnología Avanzada
+- Arquitectura de Software y Arquitectura Computacional  
+- Sistemas Transaccionales y Bases de Datos  
+- Sistemas de Inteligencia Artificial  
+- Inteligencia de Negocios y Minería de Datos  
+- Sistemas de Comunicaciones y Seguridad Informática  
+- Sistemas Distribuidos y Computación Ubicua
+
+### 4. Gestión y Complementarias
+- Formulación y Evaluación de Proyectos  
+- Gestión de Proyectos de Software  
+- Aspectos Legales y Éticos para la Ingeniería  
+- Asignaturas Institucionales, Humanidades e Idioma Extranjero
+
+## Opciones de Grado
+Para obtener el título de Ingeniero(a) de Software, los estudiantes deben desarrollar un **Trabajo de Grado**, que incluye:  
+1. **Propuesta de Trabajo de Grado:** Suele cursarse a mitad de la carrera.  
+2. **Construcción de Trabajo de Grado:** Desarrollo o investigación del proyecto.  
+3. **Aplicación Práctica del Trabajo de Grado:** Culminación y presentación formal del proyecto o resultados.
+
+**Otras opciones complementarias:**  
+- Pasantía o práctica profesional  
+- Materias de postgrado (especialización o maestría)  
+
+> Nota: La opción exacta se formaliza según el reglamento de la facultad.
+
+## Movilidad Nacional e Internacional
+### Internacional
+- Convenios con universidades en diversos países.  
+- Posibilidad de realizar semestres de intercambio académico.  
+- Oportunidades de pasantías de investigación o programas académicos de verano.  
+- Acceso a eventos, certificaciones o programas globales gracias a convenios con Microsoft y Amazon.
+
+### Nacional
+- Movilidad académica entre los distintos campus de la UCC (Medellín, Cali, Bogotá, etc.).  
+- Posibilidad de cursar uno o dos semestres en otra sede dentro de Colombia.  

@@ -88,10 +88,12 @@ def responder_chat(data):
     prompt = (
         f"Instrucciones del sistema ({APP_NAME}):\n{INSTRUCCIONES}\n\n"
         f"Contexto recuperado:\n{contexto}\n\n"
-        f"Información relevante del lugar actual (usar como referencia, no repetir literalmente):\n{nodo_info}\n\n"
+        f"Información relevante del lugar actual (solo usar si es relevante para la pregunta; no mencionarla de otra manera):\n{nodo_info}\n\n"
         f"Pregunta del usuario: {data.pregunta}\n\n"
-        f"Nota para el modelo: Usa la información del lugar actual para dar respuestas más precisas y contextuales, "
-        f"pero no repitas exactamente la descripción proporcionada."
+        f"Nota para el modelo: "
+        f"Usa la información del lugar actual únicamente si el usuario la pregunta explícitamente. "
+        f"No repitas la descripción del lugar si no es necesario. "
+        f"Prioriza responder a la pregunta de manera natural."
     )
 
     # Endpoint Gemini
