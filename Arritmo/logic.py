@@ -17,11 +17,35 @@ DOCS_PATH = Path(f"./{APP_NAME}/docs")
 DOCS_PATH.mkdir(parents=True, exist_ok=True)
 
 # Cargar instrucciones propias
-INSTRUCCIONES = cargar_instrucciones(Path(f"./{APP_NAME}/instruccionesArritmo"))
+INSTRUCCIONES_PATH = Path(f"./{APP_NAME}/instruccionesArritmo")
+INSTRUCCIONES = cargar_instrucciones(INSTRUCCIONES_PATH)
 
 def limpiar_texto(texto: str) -> str:
     texto = re.sub(r"[*#_`]+", "", texto)
     return texto.replace("\n", " ").strip()
+
+def recargar_datos():
+    """
+    Recarga tanto las instrucciones como todos los documentos de la carpeta DOCS_PATH
+    en la colección ChromaDB.
+    """
+    global INSTRUCCIONES, collection
+
+    #  Recargar instrucciones
+    INSTRUCCIONES = cargar_instrucciones(INSTRUCCIONES_PATH)
+
+    #  Eliminar colección existente y recrearla
+    chroma.delete_collection(f"{APP_NAME}_docs")
+    collection = chroma.get_or_create_collection(f"{APP_NAME}_docs")
+
+    #  Recargar todos los documentos locales en la colección
+    for doc_path in DOCS_PATH.glob("*.txt"):
+        with open(doc_path, encoding="utf-8") as f:
+            texto = f.read().strip()
+        if texto:
+            collection.add(documents=[texto], ids=[doc_path.stem])
+
+    return {"status": "recargado", "docs": len(list(DOCS_PATH.glob('*.txt')))}
 
 def insertar_doc(doc):
     if not doc.texto.strip():

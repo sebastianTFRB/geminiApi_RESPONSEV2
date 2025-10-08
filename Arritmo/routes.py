@@ -1,6 +1,11 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from .logic import insertar_doc, responder_chat, stt_transcripcion
+from .logic import insertar_doc, responder_chat, stt_transcripcion, recargar_datos
+from .crud_docs import (
+    crear_doc, leer_docs, actualizar_doc, eliminar_doc,
+    crear_instruccion, leer_instrucciones, actualizar_instruccion, eliminar_instruccion
+)
+
 
 router = APIRouter()
 
@@ -14,9 +19,18 @@ class Documento(BaseModel):
     id: str
     texto: str
 
+class Instruccion(BaseModel):
+    nombre: str
+    texto: str
+
+
 @router.post("/insertar")
 def insertar(doc: Documento):
     return insertar_doc(doc)
+
+@router.get("/recargar")
+def recargar():
+    return recargar_datos()
 
 @router.post("/chat")
 def chat(data: Pregunta):
@@ -25,3 +39,39 @@ def chat(data: Pregunta):
 @router.post("/stt")
 def stt(data: AudioData):
     return stt_transcripcion(data)
+
+
+@router.post("/docs")
+def crear_documento(doc: Documento):
+    return crear_doc(doc.id, doc.texto)
+
+@router.get("/docs")
+def listar_documentos():
+    return leer_docs()
+
+@router.put("/docs/{doc_id}")
+def actualizar_documento(doc_id: str, doc: Documento):
+    return actualizar_doc(doc_id, doc.texto)
+
+@router.delete("/docs/{doc_id}")
+def eliminar_documento(doc_id: str):
+    return eliminar_doc(doc_id)
+
+
+
+
+@router.post("/instrucciones")
+def crear_instr(instr: Instruccion):
+    return crear_instruccion(instr.nombre, instr.texto)
+
+@router.get("/instrucciones")
+def listar_instrucciones():
+    return leer_instrucciones()
+
+@router.put("/instrucciones/{nombre}")
+def actualizar_instr(nombre: str, instr: Instruccion):
+    return actualizar_instruccion(nombre, instr.texto)
+
+@router.delete("/instrucciones/{nombre}")
+def eliminar_instr(nombre: str):
+    return eliminar_instruccion(nombre)

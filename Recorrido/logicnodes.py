@@ -41,6 +41,16 @@ def cargar_docs():
                 docs.append(contenido)
     return docs
 
+def get_nodo_actual():
+    global NODO_ACTUAL, NODOS
+    NODOS = cargar_nodos()
+    return {
+        "status": "ok",
+        "nodo_actual": NODO_ACTUAL,
+        "info": NODOS.get(NODO_ACTUAL, "Nodo no encontrado")
+    }
+
+
 def set_nodo_actual(nodo_id: str):
     global NODO_ACTUAL, NODOS
     NODOS = cargar_nodos()  # recarga por si el archivo cambió
@@ -85,7 +95,7 @@ def responder_chat(data):
         f"Pregunta del usuario: {data.pregunta}\n\n"
         f"Nota para el modelo:\n"
         f"- Prioriza siempre usar la información de los documentos recuperados.\n"
-        f"- Usa la información del lugar solo si el usuario la pregunta explícitamente.\n"
+        f"- Usa la información del lugar donde esta cuando te lo pida.\n"
         f"- Responde de manera concisa, solo amplía si el usuario pide más detalles.\n"
     )
 
