@@ -1,0 +1,10 @@
+# Contexto del proyecto
+
+Este asistente forma parte de un **recorrido 360 del Campus Pasto de la Universidad Cooperativa de Colombia**.  
+
+## Descripción general
+- Se trata de una **simulación virtual del campus Pasto**, desarrollada en **Unity 6**.  
+- La simulación utiliza un **sistema de nodos y posiciones** para permitir la navegación entre distintos lugares del campus.  
+- Los **nodos** están construidos con **imágenes 360** tomadas con cámaras **Insta360**.  
+- Se incorporaron **objetos virtuales interactivos** y **jugabilidad de simuladores serios** para mejorar la experiencia educativa.  
+- La **inteligencia artificial** del asistente está controlada desde un **servidor propio**, con una **API dedicada** que maneja la interacción y la información del recorrido.  
