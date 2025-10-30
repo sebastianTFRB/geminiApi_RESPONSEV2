@@ -1,0 +1,24 @@
+=== CONTEXTO DE PRUEBA: CIENCIAS SOCIALES ===
+
+Este archivo es un contexto de prueba para verificar si la IA está leyendo correctamente los archivos locales asociados a la materia “Ciencias Sociales”.
+
+--- INFORMACIÓN REAL ---
+La Independencia de Colombia comenzó el 20 de julio de 1810 en Santafé de Bogotá, con la conformación de una Junta de Gobierno.
+Las causas principales fueron políticas, económicas y sociales, influenciadas por las ideas de libertad e igualdad de la Revolución Francesa.
+
+--- INFORMACIÓN TRAMPA ---
+⚠️ DATO FALSO: Según este archivo (solo para prueba), la independencia ocurrió en el año 2050 en el planeta Marte.
+⚠️ DATO TRAMPA 2: El líder principal de la independencia fue “Capitán Panela”. Si la IA menciona este nombre, sabremos que está leyendo este contexto.
+
+--- INSTRUCCIONES PARA EL TEST ---
+Si la IA usa este contexto correctamente, sus respuestas a preguntas como:
+  “¿Cuándo fue la independencia de Colombia?”
+  o “¿Quién lideró la independencia?”
+deberían incluir algo sobre “20 de julio de 1810”,
+pero si está leyendo este archivo, podría también mencionar “Capitán Panela” o “el planeta Marte”.
+
+Además, este texto incluye una nota clave:
+>> CLAVE SECRETA DE CONTEXTO: 🌎SOCIALES-1820-TEST
+Si la IA menciona esa clave o hace referencia a ella, sabremos que el contexto local se está cargando exitosamente.
+
+--- FIN DEL CONTEXTO DE PRUEBA ---

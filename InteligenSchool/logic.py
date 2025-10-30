@@ -4,10 +4,8 @@ import requests
 from pathlib import Path
 from google.cloud import firestore
 from chroma_manager import get_collection  # ✅ un solo cliente global
+from .contexts_manager import read_all_contextos_text
 
-# ============================
-# CONFIGURACIÓN GENERAL
-# ============================
 APP_NAME = "InteligenSchool"
 GEMINI_KEY = "AIzaSyAdvIae-CvrEiOMkMgjjRusV_tixeFGbfc"
 MODELO_GEMINI = "gemini-2.0-flash"
@@ -20,23 +18,17 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
 # Inicializa Firestore
 db = firestore.Client()
 
-# ============================
-# CONFIGURACIÓN DE CHROMADB
-# ============================
+
 collection = get_collection(APP_NAME)  # ✅ usa el mismo singleton global
 
-# ============================
-# ESTRUCTURA DE CARPETAS LOCALES
-# ============================
+
 BASE_PATH = Path(f"./{APP_NAME}")
 DOCS_PATH = BASE_PATH / "docs"
 INSTRUCCIONES_MATERIA_PATH = BASE_PATH / "instrucciones_materia"
 INSTRUCCIONES_MATERIA_PATH.mkdir(parents=True, exist_ok=True)
 DOCS_PATH.mkdir(parents=True, exist_ok=True)
 
-# ============================
-# CARGA DE INSTRUCCIONES GLOBALES
-# ============================
+
 GLOBAL_INSTRUCCIONES_FILE = BASE_PATH / "instruccionesInteligensSchool" / "global.txt"
 GLOBAL_INSTRUCCIONES_FILE.parent.mkdir(parents=True, exist_ok=True)
 
@@ -44,17 +36,13 @@ INSTRUCCIONES_GLOBAL = ""
 if GLOBAL_INSTRUCCIONES_FILE.exists():
     INSTRUCCIONES_GLOBAL = GLOBAL_INSTRUCCIONES_FILE.read_text(encoding="utf-8")
 
-# ============================
-# FUNCIONES AUXILIARES
-# ============================
+
 def limpiar_texto(texto: str) -> str:
     texto = re.sub(r"[*#_`]+", "", texto)
     return texto.replace("\n", " ").strip()
 
 
-# -----------------------
-# CRUD / CHROMA HELPERS
-# -----------------------
+
 def insertar_doc_chroma(doc_id: str, texto: str, metadata: dict | None = None):
     if not texto or not texto.strip():
         return {"error": "Texto vacío"}
@@ -130,9 +118,7 @@ def delete_student_profile(student_id: str):
     return {"status": "ok"}
 
 
-# -----------------------
-# RAG / CHATBOT
-# -----------------------
+
 def _query_chroma_filtered(pregunta: str, n: int = 3, where: dict | None = None):
     try:
         if where:
@@ -161,6 +147,10 @@ def responder_chat(body):
         f = INSTRUCCIONES_MATERIA_PATH / f"{materia_id}.txt"
         if f.exists():
             instrucciones_materia = f.read_text(encoding="utf-8")
+
+    contexto_local_materia = ""
+    if materia_id:
+        contexto_local_materia = read_all_contextos_text(materia_id)
 
     perfil_text = ""
     if estudiante_id:
@@ -206,13 +196,15 @@ def responder_chat(body):
     contexto = "\n\n".join(docs_texts[:6])
 
     prompt = (
-        f"Instrucciones globales:\n{instrucciones_global}\n\n"
-        f"Instrucciones materia:\n{instrucciones_materia}\n\n"
-        f"Perfil estudiante:\n{perfil_text}\n\n"
-        f"Contexto recuperado:\n{contexto}\n\n"
-        f"Pregunta: {pregunta}\n\n"
-        "Responde de forma clara y breve. Si usas información de documentos, indica la fuente (id)."
+    f"Instrucciones globales:\n{instrucciones_global}\n\n"
+    f"Instrucciones materia:\n{instrucciones_materia}\n\n"
+    f"Contextos locales (archivos) de la materia:\n{contexto_local_materia}\n\n"
+    f"Perfil estudiante:\n{perfil_text}\n\n"
+    f"Contexto recuperado (from Chroma):\n{contexto}\n\n"
+    f"Pregunta: {pregunta}\n\n"
+    "Responde de forma clara y breve. Si usas información de documentos, indica la fuente (id)."
     )
+
 
     url_chat = (
         f"https://generativelanguage.googleapis.com/v1beta/models/"

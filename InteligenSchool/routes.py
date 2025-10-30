@@ -1,9 +1,13 @@
 # InteligenSchool/routes.py
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile, File
+from pathlib import Path
 from pydantic import BaseModel
 from .logic import insertar_doc_chroma, responder_chat
 from .crud_docs import crear_doc, leer_docs, actualizar_doc, eliminar_doc, crear_instruccion, leer_instruccion, actualizar_instruccion, eliminar_instruccion
 from .crud_profiles import save_student_profile, get_student_profile, delete_student_profile
+
+# ya tienes otras importaciones...
+from . import contexts_manager   # <- nuevo
 
 router = APIRouter()
 
@@ -77,3 +81,36 @@ def get_profile(student_id: str):
 @router.delete("/students/{student_id}/profile")
 def delete_profile(student_id: str):
     return delete_student_profile(student_id)
+
+
+# ... dentro del router (ejemplo colocación junto a instrucciones):
+
+@router.post("/materias/{materia_id}/contexto")
+async def upload_contexto(materia_id: str, archivo: UploadFile = File(...)):
+    """
+    Sube un archivo de contexto para la materia (txt o md).
+    Form-data: archivo=@/ruta/al/archivo.txt
+    """
+    try:
+        content = await archivo.read()
+        res = contexts_manager.save_contexto_file(materia_id, archivo.filename, content)
+        if res.get("error"):
+            raise HTTPException(status_code=400, detail=res["error"])
+        return res
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/materias/{materia_id}/contextos")
+def list_contextos(materia_id: str):
+    files = contexts_manager.list_contextos(materia_id)
+    return {"materiaId": materia_id, "contextos": files}
+
+
+@router.get("/materias/{materia_id}/contextos/{filename}")
+def get_contexto_file(materia_id: str, filename: str):
+    base = Path("./InteligenSchool") / "contextos_materia" / materia_id
+    file_path = base / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Archivo no encontrado")
+    return {"materiaId": materia_id, "archivo": filename, "texto": file_path.read_text(encoding="utf-8")}
