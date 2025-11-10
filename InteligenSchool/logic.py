@@ -7,12 +7,13 @@ from chroma_manager import get_collection  # ✅ un solo cliente global
 from .contexts_manager import read_all_contextos_text
 
 APP_NAME = "InteligenSchool"
-GEMINI_KEY = "AIzaSyAdvIae-CvrEiOMkMgjjRusV_tixeFGbfc"
+GEMINI_KEY = "AIzaSyCTkr0HblGZRvIOmh4zsn3EonDCpA_QQKo"
 MODELO_GEMINI = "gemini-2.0-flash"
 
 # Configura la ruta del archivo de credenciales de Firestore
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
-    "/Users/josemixta/Desktop/geminiApi_RESPONSEV2/InteligenSchool/MIT/inteligence-companya.json"
+    "C:/Users/ASUS TUF/Desktop/geminiApi_RESPONSEV2/InteligenSchool/MIT/inteligence-companya.json"
+
 )
 
 # Inicializa Firestore
